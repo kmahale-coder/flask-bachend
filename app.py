@@ -1,26 +1,28 @@
-#backend 
-
-
-from flask import Flask, request, jsonify
-from flask_cors import CORS  # 👈 CORS Import Karo
+from flask import Flask, request, send_file
+from flask_cors import CORS
+import yt_dlp
 
 app = Flask(__name__)
-CORS(app)  # 👈 Ye CORS ko enable karega sabhi domains ke liye
+CORS(app)  # 👈 CORS enable karna mat bhoolo
 
 @app.route('/download', methods=['POST'])
-def download():
-    data = request.get_json()
-    url = data.get("url")
-    quality = data.get("quality")
+def download_video():
+    data = request.json
+    url = data.get('url')
+    quality = data.get('quality')
 
     if not url:
-        return jsonify({"error": "No URL provided"}), 400
-    
-    # Yahan tumhara YouTube download logic hoga
+        return {"error": "No URL provided"}, 400
 
-    return jsonify({"message": "Download started!"})
+    ydl_opts = {
+        'format': f'bestvideo[height<={quality}]+bestaudio/best',
+        'outtmpl': 'downloaded_video.mp4',  # 👈 MP4 format ensure karo
+    }
+
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        ydl.download([url])
+
+    return send_file('downloaded_video.mp4', as_attachment=True, mimetype='video/mp4')
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-
