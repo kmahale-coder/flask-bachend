@@ -1,5 +1,5 @@
-flask 
-flask-cors
+flask
+flask_cors
 pytube
 gunicorn
 yt-dlp
