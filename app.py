@@ -22,14 +22,16 @@ def available_streams():
     try:
         data = request.json
         video_url = data.get('url')
+        print("Received URL:", video_url)  # Debugging output
         if not video_url:
             return jsonify({"error": "URL is required"}), 400
 
         yt = YouTube(video_url)
         streams = [{"itag": stream.itag, "mime_type": stream.mime_type, "resolution": stream.resolution, "abr": stream.abr} for stream in yt.streams]
         
+        print("Available Streams:", streams)  # Debugging output
         return jsonify({"streams": streams})
 
     except Exception as e:
+        print("Error:", str(e))  # Debugging output
         return jsonify({"error": str(e)})
-
