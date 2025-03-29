@@ -16,3 +16,20 @@ audio_clip = VideoFileClip(audio_file).audio
 
 final_clip = video_clip.set_audio(audio_clip)
 final_clip.write_videofile("final_video.mp4", codec="libx264", audio_codec="aac")
+
+@app.route('/streams', methods=['POST'])
+def available_streams():
+    try:
+        data = request.json
+        video_url = data.get('url')
+        if not video_url:
+            return jsonify({"error": "URL is required"}), 400
+
+        yt = YouTube(video_url)
+        streams = [{"itag": stream.itag, "mime_type": stream.mime_type, "resolution": stream.resolution, "abr": stream.abr} for stream in yt.streams]
+        
+        return jsonify({"streams": streams})
+
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
